@@ -1,4 +1,4 @@
-# 🔪 Butcher from Hell
+# 🔪 Sh3llBr34ch
 
 A Dockerized boot-to-root CTF lab. Web command injection → SSH foothold →
 shadow-backup looting → hash cracking → `sudo` misconfiguration → **root**.
@@ -13,17 +13,16 @@ shadow-backup looting → hash cracking → `sudo` misconfiguration → **root**
 ## 🚀 How to host
 
 ```bash
-git clone https://github.com/<your-user>/butcher-from-hell.git
-cd butcher-from-hell
-docker build -t butcher .
-docker run -d --name butcher_1 -p 80:80 -p 22:22 -p 21:21 butcher
+git clone https://github.com/Rishi-Prakash1/Sh3llBr34ch.git
+cd Sh3llBr34ch
+docker build -t Sh3llBr34ch .
+docker run -d --name lab1 -p 80:80 -p 22:22 -p 21:21 Sh3llBr34ch
 ```
 
 Verify it's live:
 
 ```bash
-curl -s "http://localhost/site/connection.php?cmd=id"
-# uid=33(www-data) gid=33(www-data) groups=33(www-data)
+curl -s "http://localhost/site/"
 ```
 
 Stop / remove the lab (flags reset on next `up`):
