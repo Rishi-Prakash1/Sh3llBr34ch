@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sh3llBr34ch - Submit</title>
+<style>
+  :root{
+    --bg:#0b1020;
+    --panel:#0f1830;
+    --panel-2:#101b36;
+    --line:#1f2c4d;
+    --blue:#2f7df6;
+    --blue-dim:#1c4ea8;
+    --purple:#6a3df0;
+    --purple-2:#8b5cf6;
+    --amber:#f5b942;
+    --red:#ef5a6f;
+    --green:#3ddc84;
+    --text:#e7edff;
+    --text-dim:#7f8bb3;
+    --mono:"IBM Plex Mono","Courier New",monospace;
+    --sans:"Inter","Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(239,90,111,0.12), transparent 40%),
+      radial-gradient(circle at 85% 10%, rgba(106,61,240,0.10), transparent 45%);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:40px 24px 90px;
+  }
+
+  /* ---- Topbar ---- */
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid var(--line);
+    padding-bottom:22px;
+    margin-bottom:30px;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .brand-group{display:flex;align-items:center;gap:16px;}
+  .brand-mark{width:52px;height:52px;flex:none;}
+  .brand-text .brand{
+    font-size:28px;
+    font-weight:800;
+    color:var(--text);
+    letter-spacing:-0.5px;
+  }
+  .brand-text .brand .plus{color:var(--red);}
+  .brand-text .brand-sub{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-dim);
+    margin-top:4px;
+    letter-spacing:0.5px;
+  }
+  .brand-text .brand-sub .cat{color:var(--blue);}
+  .session-chip{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 16px;
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--text);
+  }
+  .session-chip svg{flex:none;color:var(--blue);}
+
+  /* ---- Pre-start panel ---- */
+  #pre-panel{
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:16px;
+    padding:44px 36px;
+    text-align:center;
+  }
+  #pre-panel h1{
+    font-size:22px;
+    font-weight:700;
+    color:var(--text);
+    margin:0 0 12px;
+    line-height:1.5;
+  }
+  #pre-panel p{
+    color:var(--text-dim);
+    font-size:14px;
+    line-height:1.7;
+    max-width:520px;
+    margin:0 auto 26px;
+  }
+  .rules{
+    text-align:left;
+    display:inline-block;
+    font-size:13.5px;
+    color:var(--text-dim);
+    border-left:3px solid var(--red);
+    padding:2px 0 2px 18px;
+    margin:0 0 32px;
+  }
+  .rules li{margin-bottom:8px;}
+  #start-btn, .action-btn{
+    background:linear-gradient(135deg, var(--red), var(--purple));
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:15px;
+    padding:16px 40px;
+    cursor:pointer;
+    letter-spacing:0.3px;
+    transition:filter 0.15s, transform 0.1s;
+  }
+  #start-btn:hover, .action-btn:hover{filter:brightness(1.1);}
+  #start-btn:active, .action-btn:active{transform:translateY(1px);}
+
+  /* ---- HUD ---- */
+  #hud{
+    display:none;
+    gap:18px;
+    margin-bottom:28px;
+  }
+  #hud.live{display:flex;flex-wrap:wrap;}
+  .hud-card{
+    flex:1;
+    min-width:240px;
+    border-radius:14px;
+    padding:20px 24px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .hud-card.time{background:linear-gradient(135deg, var(--blue), #1a5fd1);}
+  .hud-card.score{background:linear-gradient(135deg, var(--purple), #4527a0);}
+  .hud-icon{
+    width:40px;height:40px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .hud-icon svg{width:30px;height:30px;}
+  .hud-label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:1.2px;
+    color:rgba(255,255,255,0.75);
+    text-transform:uppercase;
+  }
+  .hud-value{
+    font-family:var(--mono);
+    font-size:30px;
+    font-weight:700;
+    color:#fff;
+    margin-top:2px;
+    letter-spacing:1px;
+  }
+  .hud-value.danger{color:#ffd9dd;animation:blink 1s step-start infinite;}
+  @keyframes blink{50%{opacity:0.4;}}
+  .hud-units{
+    display:flex;
+    gap:18px;
+    font-family:var(--mono);
+    font-size:9.5px;
+    color:rgba(255,255,255,0.55);
+    letter-spacing:1px;
+    margin-top:2px;
+  }
+  .hud-score-max{
+    font-family:var(--mono);
+    font-size:12px;
+    color:rgba(255,255,255,0.7);
+    margin-top:2px;
+  }
+
+  /* ---- Questions ---- */
+  #quiz{display:none;}
+  #quiz.live{display:block;}
+  .q-card{
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:14px;
+    padding:22px 26px;
+    margin-bottom:16px;
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+  }
+  .q-card.correct{border-color:var(--green);box-shadow:0 0 0 1px rgba(61,220,132,0.25) inset;}
+  .q-card.incorrect{border-color:var(--red);}
+  .q-badge{
+    flex:none;
+    width:54px;height:54px;
+    border-radius:12px;
+    background:linear-gradient(135deg, var(--blue), var(--blue-dim));
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--sans);
+    font-weight:800;
+    font-size:15px;
+    color:#fff;
+  }
+  .q-card.correct .q-badge{background:linear-gradient(135deg, var(--green), #1f9d5c);}
+  .q-body{flex:1;min-width:0;}
+  .q-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:8px;
+    gap:10px;
+  }
+  .q-of{font-family:var(--mono);color:var(--text-dim);font-size:12.5px;}
+  .q-points{
+    font-family:var(--mono);
+    font-size:12.5px;
+    font-weight:700;
+    color:#1a1420;
+    background:var(--amber);
+    border-radius:7px;
+    padding:4px 10px;
+    white-space:nowrap;
+  }
+  .q-text{font-size:16px;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.4;}
+  .q-row{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;}
+  .q-input{
+    flex:1;
+    min-width:200px;
+    background:#0a1226;
+    border:1px solid var(--line);
+    border-radius:9px;
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:14px;
+    padding:12px 14px;
+  }
+  .q-input::placeholder{color:#4e5a80;}
+  .q-input:focus{outline:none;border-color:var(--blue);}
+  .q-input:disabled{color:var(--text-dim);}
+  .check-btn{
+    background:var(--blue);
+    border:none;
+    border-radius:9px;
+    color:#fff;
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:0.4px;
+    padding:12px 22px;
+    cursor:pointer;
+    transition:filter 0.15s;
+  }
+  .check-btn:hover{filter:brightness(1.12);}
+  .check-btn:disabled{opacity:0.35;cursor:default;}
+  .q-feedback{
+    font-size:12.5px;
+    margin-top:10px;
+    min-height:16px;
+    font-weight:600;
+  }
+  .q-feedback.ok{color:var(--green);}
+  .q-feedback.bad{color:var(--red);}
+  .placeholder-mask{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--text-dim);
+    letter-spacing:2px;
+    margin-top:8px;
+  }
+
+  /* ---- Submit / results ---- */
+  #submit-row{
+    text-align:center;
+    margin-top:28px;
+  }
+  #results{
+    display:none;
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:16px;
+    padding:40px 32px;
+    text-align:center;
+  }
+  #results.live{display:block;}
+  #results .trophy{width:48px;height:48px;color:var(--amber);margin-bottom:10px;}
+  #results h2{
+    font-size:22px;
+    font-weight:800;
+    color:var(--text);
+    margin:0 0 6px;
+  }
+  #results .score-big{
+    font-family:var(--mono);
+    font-size:52px;
+    font-weight:800;
+    background:linear-gradient(135deg, var(--blue), var(--purple-2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    margin:14px 0;
+  }
+  #results .breakdown{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--text-dim);
+    line-height:1.9;
+    text-align:left;
+    max-width:380px;
+    margin:0 auto 26px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:16px 4px;
+  }
+  #results .breakdown span{color:var(--text);font-weight:700;}
+
+  footer{
+    margin-top:50px;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--text-dim);
+  }
+
+  @media (max-width:560px){
+    .q-card{flex-direction:column;}
+    .q-badge{width:44px;height:44px;font-size:13px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand-group">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 14.5 14.2 3.3c.6-.6 1.6-.6 2.2 0l2.3 2.3c.6.6.6 1.6 0 2.2L7.5 19H3v-4.5Z" fill="#ef5a6f"/>
+        <path d="M13 5.5 18.5 11" stroke="#ffd9dd" stroke-width="1.3"/>
+        <circle cx="19.5" cy="19.5" r="2.3" fill="#8b5cf6"/>
+      </svg>
+      <div class="brand-text">
+        <div class="brand">Sh3llBr34ch<span class="plus"> from Hell</span></div>
+        <div class="brand-sub"> CATEGORY: <span class="cat">WEB &amp; PRIVESC</span></div>
+      </div>
+    </div>
+    <div class="session-chip">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"/></svg>
+      <span id="session-id">session: ----</span>
+    </div>
+  </div>
+
+  <!-- HUD shown once attempt starts -->
+  <div id="hud">
+    <div class="hud-card time">
+      <div class="hud-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </div>
+      <div>
+        <div class="hud-label">Time remaining</div>
+        <div class="hud-value" id="timer-display">01:00:00</div>
+        <div class="hud-units"><span>HOURS</span><span>MINUTES</span><span>SECONDS</span></div>
+      </div>
+    </div>
+    <div class="hud-card score">
+      <div class="hud-icon">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M6 2h12v2h2a1 1 0 0 1 1 1v2c0 2.4-1.7 4.4-4 4.9-.6 1.6-1.9 2.8-3.5 3.3V18h3v2H7v-2h3v-2.8c-1.6-.5-2.9-1.7-3.5-3.3-2.3-.5-4-2.5-4-4.9V5a1 1 0 0 1 1-1h2V2Zm0 4H5v1c0 1.1.6 2.1 1.6 2.6A8 8 0 0 1 6 8V6Zm13 0h-1v2c0 .3 0 .7-.1 1A3 3 0 0 0 19 7V6Z"/></svg>
+      </div>
+      <div>
+        <div class="hud-label">Score</div>
+        <div class="hud-value" id="live-score">0</div>
+        <div class="hud-score-max">/ 100 + time bonus</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-start -->
+  <div id="pre-panel">
+    <h1>Root the box, then answer what you found.</h1>
+    <p>
+      This isn't a walkthrough — it checks what you recovered while rooting
+      <b>Sh3llBr34ch</b>: a command-injection foothold on the web app, an SSH
+      login, a cracked second user, and a <code>sudo</code> misconfiguration that
+      gets you to root. Attempt the machine first.
+    </p>
+    <ul class="rules">
+      <li>Starting the clock begins a single 60:00 attempt.</li>
+      <li>7 questions, 100 points total.</li>
+      <li>Root the box and solve all 7 before time runs out, and every full
+          minute left is banked as a bonus point.</li>
+      <li>Each answer is checked the moment you press "check."</li>
+      <li>The clock keeps running in the background — closing the tab won't pause it.</li>
+    </ul>
+    <br>
+    <button id="start-btn">Start attempt</button>
+  </div>
+
+  <!-- Quiz -->
+  <div id="quiz"></div>
+
+  <div id="submit-row" style="display:none;">
+    <button class="action-btn" id="finish-btn">Finish attempt</button>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+    <svg class="trophy" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12v2h2a1 1 0 0 1 1 1v2c0 2.4-1.7 4.4-4 4.9-.6 1.6-1.9 2.8-3.5 3.3V18h3v2H7v-2h3v-2.8c-1.6-.5-2.9-1.7-3.5-3.3-2.3-.5-4-2.5-4-4.9V5a1 1 0 0 1 1-1h2V2Zm0 4H5v1c0 1.1.6 2.1 1.6 2.6A8 8 0 0 1 6 8V6Zm13 0h-1v2c0 .3 0 .7-.1 1A3 3 0 0 0 19 7V6Z"/></svg>
+    <h2>Attempt closed</h2>
+    <div class="score-big" id="final-score">0</div>
+    <div class="breakdown" id="score-breakdown"></div>
+    <button class="action-btn" id="reset-btn">Start new attempt</button>
+  </div>
+
+  <footer>
+    Sh3llBr34ch · client-side scoreboard, answers verified by SHA-256 hash, no backend attached
+  </footer>
+</div>
+
+<script>
+(function(){
+
+  // ---------------------------------------------------------------
+  // Answer verification: answers are never stored as readable text.
+  // Each submitted answer is normalized, hashed (SHA-256), and the
+  // hash is compared against a precomputed digest computed once on load.
+  // ---------------------------------------------------------------
+
+  const QUESTIONS = [
+    { id:"Q1", text:"How many ports are open on the machine?", points:10, maskLen:1 },
+    { id:"Q2", text:"Full path used for command execution (everything after the IP)?", points:10, maskLen:25 },
+    { id:"Q3", text:"Usernames on the machine apart from root (alphabetical order, comma-separated)?", points:10, maskLen:16 },
+    { id:"Q4", text:"What is the flag of User 1?", points:10, maskLen:34 },
+    { id:"Q5", text:"What is the password of User 2?", points:20, maskLen:10 },
+    { id:"Q6", text:"What is the flag of User 2?", points:20, maskLen:17 },
+    { id:"Q7", text:"What is the root flag?", points:20, maskLen:20 }
+  ];
+
+  // Raw answers exist only transiently, long enough to be hashed once
+  // at load time, then the reference is dropped. normalize() strips ALL
+ 
+  const RAW_ANSWERS = [
+    "3",
+    "/site/connection.php?cmd=",
+    "butcher,jangow01",
+    "HEHE{sudo_wont_save_you_this_time}",
+    "microphone",
+    "ROOTLESS{1_4m_1n}",
+    "ROOTED{n0w_1_4m_g0d}"
+  ];
+
+  function normalize(str){
+    return str.trim().toLowerCase().replace(/\s+/g, "");
+  }
+
+  async function sha256(str){
+    const enc = new TextEncoder().encode(str);
+    const buf = await crypto.subtle.digest("SHA-256", enc);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+  }
+
+  let hashesReady = false;
+  async function initHashes(){
+    for (let i = 0; i < QUESTIONS.length; i++){
+      QUESTIONS[i].hash = await sha256(normalize(RAW_ANSWERS[i]));
+      RAW_ANSWERS[i] = null; // drop plaintext reference once hash is computed
+    }
+    hashesReady = true;
+  }
+
+  // ---------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------
+  const DURATION = 60 * 60; // seconds
+  let remaining = DURATION;
+  let timerHandle = null;
+  let attemptActive = false;
+  let answered = {}; // id -> {correct: bool, pointsAwarded: number}
+
+  const el = {
+    startBtn: document.getElementById("start-btn"),
+    prePanel: document.getElementById("pre-panel"),
+    hud: document.getElementById("hud"),
+    timerDisplay: document.getElementById("timer-display"),
+    liveScore: document.getElementById("live-score"),
+    quiz: document.getElementById("quiz"),
+    submitRow: document.getElementById("submit-row"),
+    finishBtn: document.getElementById("finish-btn"),
+    results: document.getElementById("results"),
+    finalScore: document.getElementById("final-score"),
+    breakdown: document.getElementById("score-breakdown"),
+    resetBtn: document.getElementById("reset-btn"),
+    sessionId: document.getElementById("session-id")
+  };
+
+  function fmtTime(totalSeconds){
+    const h = Math.floor(totalSeconds/3600);
+    const m = Math.floor((totalSeconds%3600)/60);
+    const s = totalSeconds%60;
+    return [h,m,s].map(v=>String(v).padStart(2,"0")).join(":");
+  }
+
+  function currentScore(){
+    return Object.values(answered).reduce((sum,a)=>sum+a.pointsAwarded,0);
+  }
+
+  function renderMask(len){
+    return "placeholder length: " + "-".repeat(len);
+  }
+
+  function buildQuiz(){
+    el.quiz.innerHTML = "";
+    QUESTIONS.forEach((q, idx) => {
+      const card = document.createElement("div");
+      card.className = "q-card";
+      card.id = "card-" + q.id;
+      card.innerHTML = `
+        <div class="q-badge">${q.id}</div>
+        <div class="q-body">
+          <div class="q-top">
+            <span class="q-of">${idx+1} of ${QUESTIONS.length}</span>
+            <span class="q-points">${q.points} pts</span>
+          </div>
+          <div class="q-text">${q.text}</div>
+          <div class="q-row">
+            <input class="q-input" type="text" id="input-${q.id}" autocomplete="off" placeholder="type your answer...">
+            <button class="check-btn" id="check-${q.id}">CHECK</button>
+          </div>
+          <div class="placeholder-mask">${renderMask(q.maskLen)}</div>
+          <div class="q-feedback" id="feedback-${q.id}"></div>
+        </div>
+      `;
+      el.quiz.appendChild(card);
+    });
+
+    QUESTIONS.forEach(q => {
+      document.getElementById("check-"+q.id).addEventListener("click", () => checkAnswer(q));
+      document.getElementById("input-"+q.id).addEventListener("keydown", (e) => {
+        if (e.key === "Enter") checkAnswer(q);
+      });
+    });
+  }
+
+  async function checkAnswer(q){
+    if (!attemptActive) return;
+    if (answered[q.id] && answered[q.id].correct) return; // already solved, lock it
+
+    const input = document.getElementById("input-"+q.id);
+    const feedback = document.getElementById("feedback-"+q.id);
+    const card = document.getElementById("card-"+q.id);
+
+    if (!hashesReady){
+      feedback.textContent = "still initializing — try again in a moment.";
+      feedback.className = "q-feedback bad";
+      return;
+    }
+
+    const value = normalize(input.value);
+    if (!value){
+      feedback.textContent = "enter an answer before checking.";
+      feedback.className = "q-feedback bad";
+      return;
+    }
+
+    const digest = await sha256(value);
+    const isCorrect = digest === q.hash;
+
+    if (isCorrect){
+      answered[q.id] = { correct: true, pointsAwarded: q.points };
+      feedback.textContent = `correct — +${q.points} pts`;
+      feedback.className = "q-feedback ok";
+      card.classList.remove("incorrect");
+      card.classList.add("correct");
+      input.disabled = true;
+      document.getElementById("check-"+q.id).disabled = true;
+    } else {
+      answered[q.id] = answered[q.id] || { correct: false, pointsAwarded: 0 };
+      feedback.textContent = "not quite — try again.";
+      feedback.className = "q-feedback bad";
+      card.classList.add("incorrect");
+    }
+
+    updateHud();
+  }
+
+  function updateHud(){
+    el.liveScore.textContent = currentScore();
+  }
+
+  function tick(){
+    remaining -= 1;
+    if (remaining <= 0){
+      remaining = 0;
+      el.timerDisplay.textContent = fmtTime(0);
+      endAttempt(false);
+      return;
+    }
+    el.timerDisplay.textContent = fmtTime(remaining);
+    el.timerDisplay.classList.toggle("danger", remaining <= 60);
+  }
+
+  function startAttempt(){
+    attemptActive = true;
+    remaining = DURATION;
+    answered = {};
+    el.prePanel.style.display = "none";
+    el.hud.classList.add("live");
+    el.quiz.classList.add("live");
+    el.submitRow.style.display = "block";
+    el.results.classList.remove("live");
+    el.sessionId.textContent = "session: " + Math.random().toString(36).slice(2,10);
+    buildQuiz();
+    updateHud();
+    el.timerDisplay.textContent = fmtTime(remaining);
+    timerHandle = setInterval(tick, 1000);
+  }
+
+  function endAttempt(finishedEarly){
+    attemptActive = false;
+    clearInterval(timerHandle);
+
+    const solvedPoints = currentScore();
+    const maxPoints = QUESTIONS.reduce((s,q)=>s+q.points,0);
+    const allSolved = QUESTIONS.every(q => answered[q.id] && answered[q.id].correct);
+
+    // Time bonus: one point per FULL minute remaining, only if the box is
+    // fully owned (all 7 solved) and the player finished before the clock ran out.
+    const minutesLeft = Math.floor(remaining / 60);
+    const timeBonus = (finishedEarly && allSolved) ? minutesLeft : 0;
+    const total = solvedPoints + timeBonus;
+
+    QUESTIONS.forEach(q => {
+      const input = document.getElementById("input-"+q.id);
+      const btn = document.getElementById("check-"+q.id);
+      if (input) input.disabled = true;
+      if (btn) btn.disabled = true;
+    });
+
+    el.hud.classList.remove("live");
+    el.quiz.classList.remove("live");
+    el.submitRow.style.display = "none";
+    el.results.classList.add("live");
+
+    el.finalScore.textContent = total;
+    el.breakdown.innerHTML = `
+      questions solved: <span>${solvedPoints} / ${maxPoints} pts</span><br>
+      time remaining at finish: <span>${fmtTime(remaining)}</span><br>
+      time bonus: <span>${timeBonus > 0 ? "+" + timeBonus + " pts (" + minutesLeft + " min left)" : "0 pts (needs all 7 solved)"}</span><br>
+      status: <span>${finishedEarly ? "submitted by player" : "time expired"}</span>
+    `;
+
+    saveAccountScore(total, solvedPoints, timeBonus);
+  }
+
+  function saveAccountScore(total, base, bonus){
+    try {
+      const key = "butcher_from_hell_scores";
+      const existing = JSON.parse(localStorage.getItem(key) || "[]");
+      existing.push({
+        score: total,
+        base: base,
+        timeBonus: bonus,
+        session: el.sessionId.textContent.replace("session: ",""),
+        at: new Date().toISOString()
+      });
+      localStorage.setItem(key, JSON.stringify(existing));
+    } catch(e){
+      // localStorage unavailable — fail silently, scoring still shown on screen
+    }
+  }
+
+  function resetAttempt(){
+    el.results.classList.remove("live");
+    el.prePanel.style.display = "block";
+    el.quiz.innerHTML = "";
+    el.timerDisplay.classList.remove("danger");
+    el.timerDisplay.textContent = "01:00:00";
+    el.liveScore.textContent = "0";
+  }
+
+  el.startBtn.addEventListener("click", startAttempt);
+  el.finishBtn.addEventListener("click", () => endAttempt(true));
+  el.resetBtn.addEventListener("click", resetAttempt);
+
+  initHashes();
+
+})();
+</script>
+</body>
+</html>
