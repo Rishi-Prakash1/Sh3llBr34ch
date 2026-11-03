@@ -1,0 +1,12 @@
+services:
+  jangow:
+    build: .
+    container_name: jangow-remix
+    hostname: jangow01
+    ports:
+      - "8080:80"     # web   -> http://localhost:8080/site/
+      - "2222:22"     # ssh   -> ssh jangow01@localhost -p 2222
+      - "2121:21"     # ftp   -> ftp localhost 2121
+      - "30000-30009:30000-30009"   # ftp passive range
+    # cap_add kept minimal; the privesc is userspace (sudo), not kernel.
+    restart: unless-stopped
